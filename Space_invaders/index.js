@@ -43,7 +43,6 @@ class Player {
     draw() {
         //vc.fillStyle = 'red';
         // c.fillRect(this.position.x, this.position.y, this.width, this.height);
-        if (this.image) {
             c.save()
             c.translate(
                 player.position.x + player.width / 2, 
@@ -61,12 +60,7 @@ class Player {
                 this.width,
                 this.height
             );
-        }
-    }
-}
-// constant para el Player
-const player = new Player();
-player.draw();
+
             c.restore()
         
     }
