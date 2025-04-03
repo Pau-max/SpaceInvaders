@@ -124,7 +124,6 @@ function animate() {
     requestAnimationFrame(animate);
     c.fillStyle = 'black';
     c.fillRect(0, 0, canvas.width, canvas.height);
-    player.draw();
     player.update();
     projectiles.forEach((projectiles, index) => {
         if(projectiles.position.y + projectiles.radius <= 0){
