@@ -2,15 +2,13 @@ const scoreEl = document.querySelector('#scoreEl');
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d'); //context del fons (2d)
 
-console.log(scoreEl)
-
-canvas.width = innerWidth; //amplada de la pestanya
-canvas.height = innerHeight; //alçada de la pestanya
+canvas.width = 1024; //amplada de la pestanya
+canvas.height = 576; //alçada de la pestanya
 
 class Player {
     // constructor del PLayer
     constructor() {
-        
+
 
 
         // La velocidad inicial del jugador 
@@ -24,7 +22,7 @@ class Player {
 
         // contant del player
         const image = new Image();
-        image.src = './img/spaceship.png' 
+        image.src = './img/spaceship.png'
         image.onload = () => {
             const scale = 0.15;
             // tamany imatge
@@ -50,7 +48,7 @@ class Player {
         //vc.fillStyle = 'red';
         // c.fillRect(this.position.x, this.position.y, this.width, this.height);
         c.save()
-        c.globalAlpha = this.opacity  
+        c.globalAlpha = this.opacity
         c.translate(
             player.position.x + player.width / 2,
             player.position.y + player.height / 2
@@ -258,7 +256,7 @@ class Grid {
                 }))
             }
         }
-        
+
     }
 
     update() {
@@ -303,7 +301,7 @@ let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
 let game = {
     over: false,
-    active: true   
+    active: true
 }
 let score = 0
 
@@ -348,16 +346,16 @@ function createParticles({ object, color, fades }) {
 // Mr.Canvaに表示されているすべてに応じて
 //funcion de todo lo que se muestre en nuetro señor canva
 function animate() {
-    if(!game.active) return
+    if (!game.active) return
     requestAnimationFrame(animate);
     c.fillStyle = 'black';
     c.fillRect(0, 0, canvas.width, canvas.height);
-    player.update ();
+    player.update();
     particles.forEach((particel, i) => {
 
-        if(particel.position.y - particel.radius >= canvas.height){
+        if (particel.position.y - particel.radius >= canvas.height) {
             particel.position.x = Math.random() * canvas.width
-            particel.position.y =  - particel.radius
+            particel.position.y = - particel.radius
 
         }
 
@@ -377,7 +375,7 @@ function animate() {
             setTimeout(() => {
                 invaderProjectiles.splice(index, 1);
             }, 0)
-        } else invaderProjectile.update() 
+        } else invaderProjectile.update()
 
         //projectil golpea al player
         if (invaderProjectile.position.y + invaderProjectile.height >= player.position.y && invaderProjectile.position.x + invaderProjectile.width >= player.position.x && invaderProjectile.position.x <= player.position.x + player.width) {
@@ -386,11 +384,11 @@ function animate() {
                 invaderProjectiles.splice(index, 1);
                 player.opacity = 0
                 game.over = true
-            }, 0) 
+            }, 0)
 
             setTimeout(() => {
                 game.active = false
-            }, 2000) 
+            }, 2000)
 
             createParticles({
                 object: player,
@@ -496,7 +494,7 @@ animate();
 //serveix per a quan presionis una tecla s'activi el mov
 addEventListener('keydown', ({ key }) => {
 
-    if(game.over) return 
+    if (game.over) return
 
     switch (key) {
         case 'a':

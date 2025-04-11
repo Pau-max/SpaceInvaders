@@ -1,17 +1,25 @@
 <!--estil del canva-->
 <style>
-    body{
+    body {
         margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+       
     }
 </style>
-<!--Texto para craer el Score-->
-<p
-style="position: fixed; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px;"
->
-<span>Score:</span><span id="scoreEl">0</span>
-</p>
-<!--inner canvas (part interior del canva)-->
-<canvas></canvas>
-<!--inner canvas-->
+
+
+<div style="position: relative;">
+    <!--Texto para craer el Score-->
+    <p
+        style="position: absolute; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px;">
+        <span>Score:</span><span id="scoreEl">0</span>
+    </p>
+    <!--inner canvas (part interior del canva)-->
+    <canvas></canvas>
+    <!--inner canvas-->
+</div>
 <!--call al js-->
 <script src="./index.js"></script>
