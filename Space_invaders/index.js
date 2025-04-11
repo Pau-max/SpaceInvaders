@@ -6,7 +6,8 @@ canvas.height = innerHeight; //alçada de la pestanya
 class Player {
     // constructor del PLayer
     constructor() {
-        // La posicion inicial del jugador
+        
+
 
         // La velocidad inicial del jugador 
         this.velocity = {
@@ -15,16 +16,18 @@ class Player {
         }
 
         this.rotation = 0;
+        this.opacity = 1
 
         // contant del player
         const image = new Image();
-        image.src = './img/spaceship.png';
+        image.src = './img/spaceship.png' 
         image.onload = () => {
             const scale = 0.15;
             // tamany imatge
-            this.image = image;
-            this.width = image.width * scale;
-            this.height = image.height * scale;
+            this.image = image
+            this.width = image.width * scale
+            this.height = image.height * scale
+            // La posicion inicial del jugador
             this.position = {
                 x: canvas.width / 2 - this.width / 2,
                 y: canvas.height - this.height - 20
@@ -43,6 +46,7 @@ class Player {
         //vc.fillStyle = 'red';
         // c.fillRect(this.position.x, this.position.y, this.width, this.height);
         c.save()
+        c.globalAlpha = this.opacity  
         c.translate(
             player.position.x + player.width / 2,
             player.position.y + player.height / 2
@@ -293,6 +297,10 @@ const keys = {
 
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
+let game = {
+    over: false,
+    active: true   
+}
 
 for (let i = 0; i < 100; i++) {
     //Caracteristicas de las particulas 
@@ -335,10 +343,11 @@ function createParticles({ object, color, fades }) {
 // Mr.Canvaに表示されているすべてに応じて
 //funcion de todo lo que se muestre en nuetro señor canva
 function animate() {
+    if(!game.active) return
     requestAnimationFrame(animate);
     c.fillStyle = 'black';
     c.fillRect(0, 0, canvas.width, canvas.height);
-    player.update();
+    player.update ();
     particles.forEach((particel, i) => {
 
         if(particel.position.y - particel.radius >= canvas.height){
@@ -359,19 +368,26 @@ function animate() {
 
     console.log(particles)
 
-    invaderProjectiles.forEach(invaderProjectile => {
+    invaderProjectiles.forEach((invaderProjectile, index) => {
         if (invaderProjectile.position.y + invaderProjectile.height >= canvas.height) {
             setTimeout(() => {
                 invaderProjectiles.splice(index, 1);
             }, 0)
-        } else invaderProjectile.update()
+        } else invaderProjectile.update() 
 
         //projectil golpea al player
         if (invaderProjectile.position.y + invaderProjectile.height >= player.position.y && invaderProjectile.position.x + invaderProjectile.width >= player.position.x && invaderProjectile.position.x <= player.position.x + player.width) {
+            console.log('you lose')
             setTimeout(() => {
                 invaderProjectiles.splice(index, 1);
-            }, 0)
-            console.log('you lose')
+                player.opacity = 0
+                game.over = true
+            }, 0) 
+
+            setTimeout(() => {
+                game.active = false
+            }, 2000) 
+
             createParticles({
                 object: player,
                 color: 'white',
@@ -472,6 +488,9 @@ animate();
 
 //serveix per a quan presionis una tecla s'activi el mov
 addEventListener('keydown', ({ key }) => {
+
+    if(game.over) return 
+
     switch (key) {
         case 'a':
             console.log('a')
@@ -511,7 +530,7 @@ addEventListener('keyup', ({ key }) => {
             keys.d.pressed = false;
             break;
 
-        case ' ':
+        case 'w':
 
             break;
     }
