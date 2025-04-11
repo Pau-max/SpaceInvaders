@@ -82,7 +82,7 @@ class Player {
 
 }
 
-//es per crear el projectil
+//es per crear el projectil del player
 class Projectile {
     constructor({ position, velocity, owner }) {
         this.position = position;
@@ -106,7 +106,8 @@ class Projectile {
         this.position.y += this.velocity.y;
     }
 }
-//Particula para la explosion del invader
+
+//Particula para la explosion de la muerte del invader
 class Particle {
     constructor({ position, velocity, radius, color, fades }) {
         this.position = position;
@@ -141,6 +142,7 @@ class Particle {
     }
 }
 
+//projectil del invader
 class InvaderProjectile {
     constructor({ position, velocity }) {
         this.position = position;
@@ -151,6 +153,7 @@ class InvaderProjectile {
 
     }
 
+    //es pinta el projectil del invader
     draw() {
         c.fillStyle = 'white'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
@@ -214,6 +217,7 @@ class Invader {
         }
     }
 
+    //projectil que surt desde el invaders
     shoot(invaderProjectiles) {
         invaderProjectiles.push(new InvaderProjectile({
             position: {
@@ -229,6 +233,8 @@ class Invader {
     }
 
 }
+
+
 // Classe para que el invader se mueva
 class Grid {
     constructor() {
@@ -289,7 +295,10 @@ const particles = []
 const player = new Player();
 const player2 = new Player();
 
+//constants de les tecles utilitzades per els dos jugadors
+//recordar que aixo no significa que sigui la tecla es nomes un parametre per saber si a estat premuda o no
 const keys = {
+    //constant de les tecles utilitzades per el player1
     a: {
         pressed: false
     },
@@ -299,6 +308,8 @@ const keys = {
     w: {
         pressed: false
     },
+
+    //constant de les tecles utilitzades per el player2
     ArrowLeft: {
         pressed: false
     },
@@ -310,13 +321,16 @@ const keys = {
     }
 }
 
-
 let frames = 0
+
+//interval aleatori de generacio dels invaders
 let randomInterval = Math.floor(Math.random() * 500 + 500)
 let game = {
     over: false,
     active: true
 }
+
+//vidas i puntuacio dels jugadors
 let vidas = 4;
 let score = 0;
 
@@ -339,7 +353,8 @@ for (let i = 0; i < 100; i++) {
         color: 'white'
     }))
 }
-//Creacion de la particulas
+
+//Creacion de la particulas per a les explocions de mort
 function createParticles({ object, color, fades }) {
     for (let i = 0; i < 15; i++) {
         //Caracteristicas de las particulas 
@@ -361,296 +376,7 @@ function createParticles({ object, color, fades }) {
 }
 
 
-// Mr.Canvaに表示されているすべてに応じて
-//funcion de todo lo que se muestre en nuetro señor canva
-function animate() {
-    if (!game.active) return
-    requestAnimationFrame(animate);
-    c.fillStyle = 'black';
-    c.fillRect(0, 0, canvas.width, canvas.height);
-    player.update();
-    player2.update();
-    particles.forEach((particel, i) => {
-
-        if (particel.position.y - particel.radius >= canvas.height) {
-            particel.position.x = Math.random() * canvas.width
-            particel.position.y = - particel.radius
-
-        }
-
-        if (particel.opacity <= 0) {
-            setTimeout(() => {
-                particles.splice(i, 1)
-            }, 0)
-
-        } else {
-            particel.update()
-        }
-    })
 
 
-    invaderProjectiles.forEach((invaderProjectile, index) => {
-        if (invaderProjectile.position.y + invaderProjectile.height >= canvas.height) {
-            setTimeout(() => {
-                invaderProjectiles.splice(index, 1);
-            }, 0)
-        } else invaderProjectile.update()
-
-        //projectil golpea al player
-        if (invaderProjectile.position.y + invaderProjectile.height >= player.position.y && invaderProjectile.position.x + invaderProjectile.width >= player.position.x && invaderProjectile.position.x <= player.position.x + player.width) {
-            console.log('you lose')
-            if (vidas == 0) {
-                setTimeout(() => {
-                    invaderProjectiles.splice(index, 1);
-                    player.opacity = 0
-                    game.over = true
-
-                    document.getElementById('winnerMessage').style.display = 'block';
-                    document.getElementById('winnerMessage').innerText = '¡Jugador 2 ha ganado!';
-
-                }, 0)
-
-
-                createParticles({
-                    object: player,
-                    color: 'white',
-                    fades: true
-                })
-            } else {
-                invaderProjectiles.splice(index, 1);
-                vidas -= 1
-                vidasEl.innerHTML = vidas
-            }
-        }
-
-        if (
-            invaderProjectile.position.y + invaderProjectile.height >= player2.position.y &&
-            invaderProjectile.position.x + invaderProjectile.width >= player2.position.x &&
-            invaderProjectile.position.x <= player2.position.x + player2.width
-        ) {
-            console.log('Player 2 hit');
-            if (vidasP2 == 0) {
-                setTimeout(() => {
-                    invaderProjectiles.splice(index, 1);
-                    player2.opacity = 0;
-                    game.over = true;
-
-                    document.getElementById('winnerMessage').style.display = 'block';
-                    document.getElementById('winnerMessage').innerText = '¡Jugador 1 ha ganado!';
-
-                }, 0);
-
-                createParticles({
-                    object: player2,
-                    color: 'white',
-                    fades: true
-                });
-            } else {
-                invaderProjectiles.splice(index, 1);
-                vidasP2 -= 1;
-                vidasP2El.innerHTML = vidasP2;
-            }
-        }
-
-    })
-
-
-
-    projectiles.forEach((projectiles, index) => {
-        if (projectiles.position.y + projectiles.radius <= 0) {
-            setTimeout(() => {
-                projectiles.splice(index, 1)
-            }, 0)
-        } else {
-            projectiles.update()
-        }
-    });
-
-    grids.forEach((grid, gridIndex) => {
-        grid.update()
-
-        //Spawnear Projectiles de los Invaders
-        if (frames % 100 === 0 && grid.invaders.length > 0) {
-            grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(invaderProjectiles)
-        }
-
-        grid.invaders.forEach((invader, i) => {
-            invader.update({ velocity: grid.velocity })
-            // los projectiles golpean a los invaders
-            projectiles.forEach((projectile, j) => {
-                if (projectile.position.y - projectile.radius <= invader.position.y + invader.height && projectile.position.x + projectile.radius >= invader.position.x && projectile.position.x - projectile.radius <= invader.position.x + invader.width && projectile.position.y + projectile.radius >= invader.position.y) {
-
-
-                    setTimeout(() => {
-                        const invaderFound = grid.invaders.find(
-                            (invader2) => invader2 === invader
-                        )
-                        const projectileFound = projectiles.find(
-                            (projectile2) => projectile2 === projectile
-                        )
-
-                        //eliminar projectiles y invaders
-                        if (invaderFound && projectileFound) {
-                            if (projectile.owner === 'player1') {
-                                score += 1;
-                                scoreEl.innerHTML = score;
-                            } else if (projectile.owner === 'player2') {
-                                scoreP2 += 1;
-                                scoreP2El.innerHTML = scoreP2;
-                            }
-
-                            if (score == 100) {
-                                setTimeout(() => {
-                                    game.active = false
-                                    document.getElementById('winnerMessage').style.display = 'block';
-                                }, 1000)
-                            }
-
-
-                            grid.invaders.splice(i, 1)
-                            projectiles.splice(j, 1)
-
-                            if (grid.invaders.length > 0) {
-                                const firstInvader = grid.invaders[0]
-                                const lastInvader = grid.invaders[grid.invaders.length - 1]
-
-                                grid.width = lastInvader.position.x - firstInvader.position.x + lastInvader.width
-                                grid.position.x = firstInvader.position.x
-                            } else {
-                                grids.splice(gridIndex, 1)
-                            }
-                        }
-                    }, 0)
-
-                }
-            })
-
-        })
-    })
-
-    if (keys.a.pressed && player.position.x >= 0) {
-        player.velocity.x = -7;
-        player.rotation = -0.15;
-    } else if (keys.d.pressed && player.position.x + player.width <= canvas.width) {
-        player.velocity.x = 7;
-        player.rotation = 0.15;
-    } else {
-        player.velocity.x = 0;
-        player.rotation = 0;
-    }
-
-    if (keys.ArrowLeft.pressed && player2.position.x >= 0) {
-        player2.velocity.x = -7;
-        player2.rotation = -0.01;
-    } else if (keys.ArrowRight.pressed && player2.position.x + player2.width <= canvas.width) {
-        player2.velocity.x = 7;
-        player2.rotation = 0.01;
-    } else {
-        player2.velocity.x = 0;
-        player2.rotation = 0;
-    }
-
-
-    //Spawnear Invaders
-    if (frames % randomInterval === 0) {
-        grids.push(new Grid())
-        randomInterval = Math.floor(Math.random() * 500 + 500)
-        frames = 0
-    }
-
-
-
-    frames++
-}
-
-// execute order animate 
+// execute function animate 
 animate();
-
-//serveix per a quan presionis una tecla s'activi el mov
-addEventListener('keydown', ({ key }) => {
-
-    if (game.over) return
-
-    switch (key) {
-        case 'a':
-            console.log('a')
-            keys.a.pressed = true;
-            break;
-
-        case 'd':
-            console.log('d')
-            keys.d.pressed = true;
-            break;
-
-        case 'w':
-            console.log('w')
-            projectiles.push(
-                new Projectile({
-                    position: {
-                        x: player.position.x + player.width / 2,
-                        y: player.position.y
-                    },
-                    velocity: {
-                        x: 0,
-                        y: -10
-                    },
-                    owner: 'player1'
-                })
-            )
-            break;
-
-        case 'ArrowLeft':
-            console.log('ArrowLeft')
-            keys.ArrowLeft.pressed = true;
-            break;
-
-        case 'ArrowRight':
-            console.log('ArrowRight')
-            keys.ArrowRight.pressed = true;
-            break;
-
-        case 'ArrowUp':
-            console.log('space')
-            projectiles.push(
-                new Projectile({
-                    position: {
-                        x: player2.position.x + player2.width / 2,
-                        y: player2.position.y
-                    },
-                    velocity: {
-                        x: 0,
-                        y: -10
-                    },
-                    owner: 'player2'
-                })
-            )
-            break;
-    }
-})
-
-addEventListener('keyup', ({ key }) => {
-    switch (key) {
-        case 'a':
-            keys.a.pressed = false;
-            break;
-
-        case 'd':
-            keys.d.pressed = false;
-            break;
-
-        case 'w':
-
-            break;
-
-        case 'ArrowLeft':
-            keys.ArrowLeft.pressed = false;
-            break;
-
-        case 'ArrowRight':
-            keys.ArrowRight.pressed = false;
-            break;
-
-        case 'ArrowUp':
-            break;
-    }
-})
