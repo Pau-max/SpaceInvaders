@@ -1,5 +1,9 @@
+const scoreEl = document.querySelector('#scoreEl');
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d'); //context del fons (2d)
+
+console.log(scoreEl)
+
 canvas.width = innerWidth; //amplada de la pestanya
 canvas.height = innerHeight; //alçada de la pestanya
 
@@ -254,7 +258,7 @@ class Grid {
                 }))
             }
         }
-        console.log(this.invaders)
+        
     }
 
     update() {
@@ -301,6 +305,7 @@ let game = {
     over: false,
     active: true   
 }
+let score = 0
 
 for (let i = 0; i < 100; i++) {
     //Caracteristicas de las particulas 
@@ -366,7 +371,6 @@ function animate() {
         }
     })
 
-    console.log(particles)
 
     invaderProjectiles.forEach((invaderProjectile, index) => {
         if (invaderProjectile.position.y + invaderProjectile.height >= canvas.height) {
@@ -433,6 +437,9 @@ function animate() {
 
                         //eliminar projectiles y invaders
                         if (invaderFound && projectileFound) {
+                            score += 100
+                            console.log(score)
+                            scoreEl.innerHTML = score
                             createParticles({
                                 object: invader,
                                 fades: true
