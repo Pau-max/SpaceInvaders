@@ -1,4 +1,7 @@
 const scoreEl = document.querySelector('#scoreEl');
+const vidasEl = document.querySelector('#vidasEl');
+const scoreP2El = document.querySelector('#scoreP2El');
+const vidasP2El = document.querySelector('#vidasP2El');
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d'); //context del fons (2d)
 
@@ -81,11 +84,11 @@ class Player {
 
 //es per crear el projectil
 class Projectile {
-    constructor({ position, velocity }) {
+    constructor({ position, velocity, owner }) {
         this.position = position;
         this.velocity = velocity;
-
         this.radius = 4;
+        this.owner = owner; // 'player1' o 'player2'
     }
 
     draw() {
@@ -284,6 +287,7 @@ const particles = []
 
 // constant para el Player
 const player = new Player();
+const player2 = new Player();
 
 const keys = {
     a: {
@@ -294,8 +298,18 @@ const keys = {
     },
     w: {
         pressed: false
+    },
+    ArrowLeft: {
+        pressed: false
+    },
+    ArrowRight: {
+        pressed: false
+    },
+    ArrowUp: {
+        pressed: false
     }
 }
+
 
 let frames = 0
 let randomInterval = Math.floor(Math.random() * 500 + 500)
@@ -303,7 +317,11 @@ let game = {
     over: false,
     active: true
 }
-let score = 0
+let vidas = 4;
+let score = 0;
+
+let vidasP2 = 4;
+let scoreP2 = 0;
 
 for (let i = 0; i < 100; i++) {
     //Caracteristicas de las particulas 
@@ -351,6 +369,7 @@ function animate() {
     c.fillStyle = 'black';
     c.fillRect(0, 0, canvas.width, canvas.height);
     player.update();
+    player2.update();
     particles.forEach((particel, i) => {
 
         if (particel.position.y - particel.radius >= canvas.height) {
@@ -380,22 +399,59 @@ function animate() {
         //projectil golpea al player
         if (invaderProjectile.position.y + invaderProjectile.height >= player.position.y && invaderProjectile.position.x + invaderProjectile.width >= player.position.x && invaderProjectile.position.x <= player.position.x + player.width) {
             console.log('you lose')
-            setTimeout(() => {
+            if (vidas == 0) {
+                setTimeout(() => {
+                    invaderProjectiles.splice(index, 1);
+                    player.opacity = 0
+                    game.over = true
+
+                    document.getElementById('winnerMessage').style.display = 'block';
+                    document.getElementById('winnerMessage').innerText = '¡Jugador 2 ha ganado!';
+
+                }, 0)
+
+
+                createParticles({
+                    object: player,
+                    color: 'white',
+                    fades: true
+                })
+            } else {
                 invaderProjectiles.splice(index, 1);
-                player.opacity = 0
-                game.over = true
-            }, 0)
-
-            setTimeout(() => {
-                game.active = false
-            }, 2000)
-
-            createParticles({
-                object: player,
-                color: 'white',
-                fades: true
-            })
+                vidas -= 1
+                vidasEl.innerHTML = vidas
+            }
         }
+
+        if (
+            invaderProjectile.position.y + invaderProjectile.height >= player2.position.y &&
+            invaderProjectile.position.x + invaderProjectile.width >= player2.position.x &&
+            invaderProjectile.position.x <= player2.position.x + player2.width
+        ) {
+            console.log('Player 2 hit');
+            if (vidasP2 == 0) {
+                setTimeout(() => {
+                    invaderProjectiles.splice(index, 1);
+                    player2.opacity = 0;
+                    game.over = true;
+
+                    document.getElementById('winnerMessage').style.display = 'block';
+                    document.getElementById('winnerMessage').innerText = '¡Jugador 1 ha ganado!';
+
+                }, 0);
+
+                createParticles({
+                    object: player2,
+                    color: 'white',
+                    fades: true
+                });
+            } else {
+                invaderProjectiles.splice(index, 1);
+                vidasP2 -= 1;
+                vidasP2El.innerHTML = vidasP2;
+            }
+        }
+
     })
 
 
@@ -435,13 +491,21 @@ function animate() {
 
                         //eliminar projectiles y invaders
                         if (invaderFound && projectileFound) {
-                            score += 100
-                            console.log(score)
-                            scoreEl.innerHTML = score
-                            createParticles({
-                                object: invader,
-                                fades: true
-                            })
+                            if (projectile.owner === 'player1') {
+                                score += 1;
+                                scoreEl.innerHTML = score;
+                            } else if (projectile.owner === 'player2') {
+                                scoreP2 += 1;
+                                scoreP2El.innerHTML = scoreP2;
+                            }
+
+                            if (score == 100) {
+                                setTimeout(() => {
+                                    game.active = false
+                                    document.getElementById('winnerMessage').style.display = 'block';
+                                }, 1000)
+                            }
+
 
                             grid.invaders.splice(i, 1)
                             projectiles.splice(j, 1)
@@ -473,6 +537,17 @@ function animate() {
     } else {
         player.velocity.x = 0;
         player.rotation = 0;
+    }
+
+    if (keys.ArrowLeft.pressed && player2.position.x >= 0) {
+        player2.velocity.x = -7;
+        player2.rotation = -0.01;
+    } else if (keys.ArrowRight.pressed && player2.position.x + player2.width <= canvas.width) {
+        player2.velocity.x = 7;
+        player2.rotation = 0.01;
+    } else {
+        player2.velocity.x = 0;
+        player2.rotation = 0;
     }
 
 
@@ -518,7 +593,35 @@ addEventListener('keydown', ({ key }) => {
                     velocity: {
                         x: 0,
                         y: -10
-                    }
+                    },
+                    owner: 'player1'
+                })
+            )
+            break;
+
+        case 'ArrowLeft':
+            console.log('ArrowLeft')
+            keys.ArrowLeft.pressed = true;
+            break;
+
+        case 'ArrowRight':
+            console.log('ArrowRight')
+            keys.ArrowRight.pressed = true;
+            break;
+
+        case 'ArrowUp':
+            console.log('space')
+            projectiles.push(
+                new Projectile({
+                    position: {
+                        x: player2.position.x + player2.width / 2,
+                        y: player2.position.y
+                    },
+                    velocity: {
+                        x: 0,
+                        y: -10
+                    },
+                    owner: 'player2'
                 })
             )
             break;
@@ -537,6 +640,17 @@ addEventListener('keyup', ({ key }) => {
 
         case 'w':
 
+            break;
+
+        case 'ArrowLeft':
+            keys.ArrowLeft.pressed = false;
+            break;
+
+        case 'ArrowRight':
+            keys.ArrowRight.pressed = false;
+            break;
+
+        case 'ArrowUp':
             break;
     }
 })

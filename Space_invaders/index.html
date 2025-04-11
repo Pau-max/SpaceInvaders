@@ -6,17 +6,46 @@
         justify-content: center;
         align-items: center;
         background-color: black;
-       
+
     }
 </style>
+<div id="winnerMessage" style="
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    color: lime;
+    font-family: sans-serif;
+    z-index: 20;
+">
+    ¡Has ganado!
+</div>
 
 
 <div style="position: relative;">
-    <!--Texto para craer el Score-->
+    <!--Texto para craer el Score Player 1-->
     <p
         style="position: absolute; z-index: 10; color: white; left: 10px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px;">
         <span>Score:</span><span id="scoreEl">0</span>
     </p>
+    <!--Texto para craer el Vidas Player 1-->
+    <p
+        style="position: absolute; z-index: 10; color: white; left: 450px; top: 10px; margin: 0; font-family: sans-serif; font-size: 14px;">
+        <span>Vida:</span><span id="vidasEl">4</span>
+    </p>
+    <!--Texto para craer el Score Player 2-->
+    <p
+        style="position: absolute; z-index: 10; color: white; left: 451px; top: 30px; margin: 0; font-family: sans-serif; font-size: 14px;">
+        <span>Score P2:</span><span id="scoreP2El">0</span>
+    </p>
+    <!--Texto para craer el Vidas Player 2-->
+    <p
+        style="position: absolute; z-index: 10; color: white; left: 750px; top: 30px; margin: 0; font-family: sans-serif; font-size: 14px;">
+        <span>Vida P2:</span><span id="vidasP2El">4</span>
+    </p>
+
     <!--inner canvas (part interior del canva)-->
     <canvas></canvas>
     <!--inner canvas-->
